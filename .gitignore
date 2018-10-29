@@ -1,4 +1,5 @@
 MANIFEST
+.ipynb_checkpoints/*
 test.sh
 debug.py
 winbuild*
