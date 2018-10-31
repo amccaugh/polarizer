@@ -58,8 +58,13 @@ model = PPO2(MlpPolicy, env, verbose=1,
 #                gamma=0.99, n_steps=128, ent_coef=0.01, learning_rate=1e-3, vf_coef=0.5,
 #                max_grad_norm=0.5, lam=0.95, nminibatches=4, noptepochs=4, cliprange=0.2,
 #                tensorboard_log=None, _init_setup_model=True)
-model.learn(total_timesteps=1000000)
 
+#%%
+model.load("polarizer_save_data")
+#%%
+model.learn(total_timesteps=int(3e6))
+#%%
+model.save("polarizer_save_data")
 #%%
 all_obs = []
 all_rewards = []

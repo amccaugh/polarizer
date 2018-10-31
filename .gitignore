@@ -7,7 +7,7 @@ docs/_*
 .*.swp
 
 # Byte-compiled / optimized / DLL files
-__pycache__/
+*__pycache__/
 *.py[cod]
 
 # C extensions
@@ -70,3 +70,4 @@ target/
 *.DS_Store
 *.gds
 *.bat
+*.pyc

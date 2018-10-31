@@ -15,7 +15,7 @@ class PolarizerEnv(gym.Env):
         self.tau = 1
         self.mu = 1e6
         self.randomize_input_polarization = True
-        self.max_num_steps = 1024
+        self.max_num_steps = 4096
         self.theta_max = 180
         self.theta_stepsize = 1
         self.num_steps = 0
