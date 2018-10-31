@@ -14,7 +14,7 @@ plt.ion()
 #     # import pdb; pdb.set_trace()
 import gym
 
-from stable_baselines.common.policies import MlpPolicy
+from stable_baselines.common.policies import MlpPolicy, MlpLstmPolicy
 from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines import PPO2
 
@@ -51,19 +51,19 @@ def learning_rate_anneal(proportion):
     learning_rate = np.exp((np.log(stop)-np.log(start))*(1-proportion) + np.log(start))
     return learning_rate
 
-model = PPO2(MlpPolicy, env, verbose=1,
-                gamma=0.99, n_steps=1024, ent_coef=0.01, learning_rate=learning_rate_anneal, vf_coef=0.5,
+model = PPO2(MlpLstmPolicy, env, verbose=1,
+                gamma=0.99, n_steps=2048, ent_coef=0.01, learning_rate=learning_rate_anneal, vf_coef=0.5,
                 max_grad_norm=0.5, lam=0.95, nminibatches=8, noptepochs=8, cliprange=0.2,
                 tensorboard_log='/tmp/tensorboard/', _init_setup_model=True)
 #                gamma=0.99, n_steps=128, ent_coef=0.01, learning_rate=1e-3, vf_coef=0.5,
 #                max_grad_norm=0.5, lam=0.95, nminibatches=4, noptepochs=4, cliprange=0.2,
 #                tensorboard_log=None, _init_setup_model=True)
 
-#%%
-model.load("polarizer_save_data")
-#%%
-model.learn(total_timesteps=int(3e6))
-#%%
+#  #%%
+#model.load("polarizer_save_data")
+# #%%
+model.learn(total_timesteps=int(10e6))
+# #%%
 model.save("polarizer_save_data")
 #%%
 all_obs = []
