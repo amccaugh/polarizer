@@ -2,8 +2,8 @@
 
 
 #%%
-%load_ext autoreload
-%autoreload 2
+#%load_ext autoreload
+#%autoreload 2
 import gym_polarizer # Register the environment 'polarizer-v0'
 import numpy as np
 from matplotlib import pyplot as plt
@@ -51,7 +51,7 @@ def learning_rate_anneal(proportion):
     learning_rate = np.exp((np.log(stop)-np.log(start))*(1-proportion) + np.log(start))
     return learning_rate
 
-model = PPO2(MlpLstmPolicy, env, verbose=1,
+model = PPO2(MlpPolicy, env, verbose=1,
                 gamma=0.99, n_steps=2048, ent_coef=0.01, learning_rate=learning_rate_anneal, vf_coef=0.5,
                 max_grad_norm=0.5, lam=0.95, nminibatches=8, noptepochs=8, cliprange=0.2,
                 tensorboard_log='/tmp/tensorboard/', _init_setup_model=True)
@@ -62,7 +62,7 @@ model = PPO2(MlpLstmPolicy, env, verbose=1,
 #  #%%
 #model.load("polarizer_save_data")
 # #%%
-model.learn(total_timesteps=int(10e6))
+model.learn(total_timesteps=int(10e3))
 # #%%
 model.save("polarizer_save_data")
 #%%
