@@ -62,7 +62,7 @@ model = PPO2(MlpPolicy, env, verbose=1,
 #  #%%
 #model.load("polarizer_save_data")
 # #%%
-model.learn(total_timesteps=int(10e3))
+model.learn(total_timesteps=int(30e6))
 # #%%
 model.save("polarizer_save_data")
 #%%
