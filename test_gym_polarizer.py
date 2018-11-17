@@ -1,26 +1,16 @@
-
-
-
-#%%
-#%load_ext autoreload
-#%autoreload 2
 import gym_polarizer # Register the environment 'polarizer-v0'
 import numpy as np
 from matplotlib import pyplot as plt
-plt.ion()
-
-# if __name__ == '__main__':
-#     print('hello')
-#     # import pdb; pdb.set_trace()
 import gym
-
-from stable_baselines.common.policies import MlpPolicy, MlpLstmPolicy
+from stable_baselines.common.policies import MlpPolicy, MlpLnLstmPolicy, MlpLstmPolicy
 from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines import PPO2
+import os
 
-env = gym.make('polarizer-v0')
-# env = gym.make('CartPole-v1')
-env = DummyVecEnv([lambda: env])  # The algorithms require a vectorized environment to run
+
+#save_dir = '/tmp/tensorboard/'
+save_dir = '/home/anm16/tensorboard/'
+parameter_save_path = os.path.join(save_dir, 'polarizer_save_data')
 
 # Defined in https://github.com/hill-a/stable-baselines/blob/master/stable_baselines/ppo2/ppo2.py
     # Proximal Policy Optimization algorithm (GPU version).
@@ -42,6 +32,18 @@ env = DummyVecEnv([lambda: env])  # The algorithms require a vectorized environm
     # :param verbose: (int) the verbosity level: 0 none, 1 training information, 2 tensorflow debug
     # :param tensorboard_log: (str) the log location for tensorboard (if None, no logging)
     # :param _init_setup_model: (bool) Whether or not to build the network at the creation of the instance
+    
+
+# Custom policy - from https://stable-baselines.readthedocs.io/en/master/guide/custom_policy.html
+class CustomMlpLnLstmPolicy(MlpLnLstmPolicy):
+    def __init__(self, *args, **kwargs):
+        super(MlpLnLstmPolicy, self).__init__(*args, **kwargs,
+                     n_lstm=32, # Default 256
+                     layers = [32,32], # Default [64,64]
+                     feature_extraction = 'mlp',
+                     )
+ 
+
 
 def learning_rate_anneal(proportion):
     """ The learning rate can be a function accepting a proportion-of-steps-
@@ -51,21 +53,34 @@ def learning_rate_anneal(proportion):
     learning_rate = np.exp((np.log(stop)-np.log(start))*(1-proportion) + np.log(start))
     return learning_rate
 
-model = PPO2(MlpPolicy, env, verbose=1,
-                gamma=0.99, n_steps=2048, ent_coef=0.01, learning_rate=learning_rate_anneal, vf_coef=0.5,
-                max_grad_norm=0.5, lam=0.95, nminibatches=8, noptepochs=8, cliprange=0.2,
-                tensorboard_log='/tmp/tensorboard/', _init_setup_model=True)
-#                gamma=0.99, n_steps=128, ent_coef=0.01, learning_rate=1e-3, vf_coef=0.5,
-#                max_grad_norm=0.5, lam=0.95, nminibatches=4, noptepochs=4, cliprange=0.2,
-#                tensorboard_log=None, _init_setup_model=True)
+env = gym.make('polarizer-v0')
+# env = gym.make('CartPole-v1')
+env = DummyVecEnv([lambda: env])  # The algorithms require a vectorized environment to run
 
-#  #%%
-#model.load("polarizer_save_data")
-# #%%
-model.learn(total_timesteps=int(30e6))
-# #%%
-model.save("polarizer_save_data")
+
+# Under-development MLP + LSTM policy
+model = PPO2(MlpLstmPolicy, env,
+             verbose=1,
+             nminibatches = 1,
+             learning_rate=learning_rate_anneal,
+             tensorboard_log=save_dir,
+#             noptepochs=1, # Needed until update_fac bug is fixed
+             )
+
+model.learn(total_timesteps=int(1e5))
+
+## Working MLP implementation
+#model = PPO2(MlpPolicy, env, verbose=1,
+#                gamma=0.99, n_steps=2048, ent_coef=0.01, learning_rate=learning_rate_anneal, vf_coef=0.5,
+#                max_grad_norm=0.5, lam=0.95, nminibatches=8, noptepochs=8, cliprange=0.2,
+#                tensorboard_log=save_dir, _init_setup_model=True)
+#model.learn(total_timesteps=int(30e6))
+
+
+model.save(parameter_save_path)
 #%%
+#model.load(parameter_save_path)
+
 all_obs = []
 all_rewards = []
 all_dones = []
